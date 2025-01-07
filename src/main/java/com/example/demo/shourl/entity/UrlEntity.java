@@ -23,7 +23,7 @@ public class UrlEntity {
     private String surl;
 
     @CreatedDate
-    @Column(updatable = false)
+    @Column(updatable = false)//해당 값이 생성된 이후 수정되지 않도록 보장
     private LocalDateTime joinDate;
 
     private LocalDateTime expireDate;
