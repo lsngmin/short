@@ -37,8 +37,11 @@ public class UrlController {
         return urlDTO.getSurl();
     }
     @GetMapping("/{uuid}")
-    public ResponseEntity<Void> get(@PathVariable String uuid) {
+    public ResponseEntity<?> get(@PathVariable String uuid) {
         UrlDTO urlDTO = urlService.read(uuid);
+        if (urlDTO.getExpireDate().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body("URL is expired");//현재 시간 보다 만료기간이 전이면 만료되었다는 것이므로 연결하지 않음
+        }
         String ourl = urlDTO.getOurl();
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(ourl))
