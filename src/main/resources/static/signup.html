@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign up</title>
+  <style>
+    .error-message {
+      color: red;
+    }
+    .success-message {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+<h2>Sign Up</h2>
+
+<form id="signupForm">
+  <input id="email" type="text" name="email" placeholder="Email" required />
+  <input id="pw" type="password" name="pw" placeholder="Password" required />
+  <button id="submit" type="button">Submit</button>
+</form>
+
+<div id="message"></div>
+
+<script>
+  // 버튼 클릭 시 서버에 데이터 전송
+  document.getElementById("submit").addEventListener("click", function() {
+    var email = document.getElementById("email").value;
+    var pw = document.getElementById("pw").value;
+
+    // 사용자 입력 검증
+    if (!email || !pw) {
+      displayMessage("Please fill in all fields", "error");
+      return;
+    }
+
+    // POST 요청 보내기
+    fetch("/api/v1/user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        pw: pw
+      })
+    })
+            .then(response => {
+              if (!response.ok) {
+                // 서버에서 4xx, 5xx 상태 코드 반환 시 처리
+                return response.json().then(data => {
+                  displayMessage(data.error || "Unknown error occurred", "error");
+                });
+              }
+              return response.json();
+            })
+            .then(data => {
+              // 성공적인 응답 처리
+              displayMessage("Sign up successful!", "success");
+              console.log("Success:", data);
+            })
+            .catch((error) => {
+              // 네트워크 오류 등 예외 처리
+              displayMessage("Network error, please try again later", "error");
+              console.error("Error:", error);
+            });
+  });
+
+  // 메시지를 화면에 표시하는 함수
+  function displayMessage(message, type) {
+    const messageDiv = document.getElementById("message");
+    messageDiv.textContent = message;
+    if (type === "error") {
+      messageDiv.className = "error-message";
+    } else if (type === "success") {
+      messageDiv.className = "success-message";
+    }
+  }
+</script>
+</body>
+</html>
