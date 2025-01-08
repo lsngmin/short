@@ -38,6 +38,14 @@ public class UserService {
 
         return bCryptPasswordEncoder.matches(request.getPw(), user.getPw());
     }
+    public UserRequest login_JWT(UserRequest request) {
+        String email = request.getEmail();
+        UserEntity user = userRepository.findByEmail(email).orElseThrow(() -> UserExceptions.NOT_FOUND.get());
+        if(!bCryptPasswordEncoder.matches(request.getPw(), user.getPw())) {
+            throw UserExceptions.BAD_REQUEST.get();
+        }
+        return new UserRequest(user);
+    }
 
     private static final int MAX_ATTEMPTS = 5;
     private static final long LOCK_TIME_DURATION = 30 * 60 * 1000; // 30 minutes
